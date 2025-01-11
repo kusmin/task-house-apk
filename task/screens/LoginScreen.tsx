@@ -1,12 +1,12 @@
 // src/screens/LoginScreen.tsx
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, TextInput, Button, Title, useTheme } from 'react-native-paper';
+import api from '../services/api';
+import { setItem } from '../services/storage'; // Função de armazenamento abstrato
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation';
-import api from "../services/api";
-import {setItem} from "../services/storage";
 
 type LoginScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
@@ -18,58 +18,94 @@ type Props = {
 };
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
+    const { colors } = useTheme();
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
     const handleLogin = async () => {
         if (!username || !password) {
-            Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+            alert('Por favor, preencha todos os campos.');
             return;
         }
 
         try {
-            const response = await api.post('/auth/login', { username, password });
+            const response = await api.post('/login', { username, password });
             const token: string = response.data.token;
 
-            console.log(response);
             await setItem('token', token);
             navigation.replace('TaskList');
         } catch (error) {
             console.error(error);
-            Alert.alert('Erro', 'Falha no login. Verifique suas credenciais.');
+            alert('Falha no login. Verifique suas credenciais.');
         }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Title style={styles.title}>Login</Title>
             <TextInput
-                style={styles.input}
+                label="Usuário"
                 value={username}
+                mode="outlined"
                 onChangeText={setUsername}
-                placeholder="Username"
+                style={styles.input}
                 autoCapitalize="none"
+                left={<TextInput.Icon name="account" />}
             />
             <TextInput
-                style={styles.input}
+                label="Senha"
                 value={password}
+                mode="outlined"
                 onChangeText={setPassword}
-                placeholder="Password"
+                style={styles.input}
                 secureTextEntry
+                left={<TextInput.Icon name="lock" />}
             />
-            <Button title="Login" onPress={handleLogin} />
+            <Button
+                mode="contained"
+                onPress={handleLogin}
+                style={styles.button}
+                contentStyle={styles.buttonContent}
+            >
+                Entrar
+            </Button>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                <Text style={styles.link}>Não tem uma conta? Registre-se</Text>
+                <Text style={[styles.link, { color: colors.primary }]}>
+                    Não tem uma conta? Registre-se
+                </Text>
             </TouchableOpacity>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', padding: 16 },
-    title: { fontSize: 24, marginBottom: 24, textAlign: 'center' },
-    input: { borderWidth: 1, padding: 12, marginVertical: 8, borderRadius: 8 },
-    link: { color: 'blue', marginTop: 16, textAlign: 'center' },
+    container: {
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center',
+        backgroundColor: '#f6f6f6',
+    },
+    title: {
+        textAlign: 'center',
+        marginBottom: 20,
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#6200ee',
+    },
+    input: {
+        marginBottom: 15,
+    },
+    button: {
+        marginVertical: 10,
+    },
+    buttonContent: {
+        paddingVertical: 8,
+    },
+    link: {
+        textAlign: 'center',
+        marginTop: 15,
+        fontSize: 16,
+    },
 });
 
 export default LoginScreen;

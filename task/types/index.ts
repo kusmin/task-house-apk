@@ -8,27 +8,27 @@ export interface User {
 
 export interface Task {
     ID: number;
-    Title: string;
-    Description: string;
-    Completed: boolean;
+    title: string;
+    description: string;
+    completed: boolean;
     UserID: number;
     DueDate: string; // ISO String
 }
 
 export interface Category {
     ID: number;
-    Name: string;
-    Notes: Note[];
+    name: string;
+    notes: Note[];
 }
 
 export interface Note {
     ID: number;
-    Title: string;
-    Content: string;
+    title: string;
+    content: string;
     ImageURL?: string;
-    Link?: string;
-    CategoryID: number;
-    Category?: Category;
-    UserID: number;
+    link?: string;
+    category_id: number;
+    category?: Category;
+    user_id: number;
     DueDate?: string; // Opcional, caso deseje adicionar
 }

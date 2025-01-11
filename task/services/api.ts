@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import {getItem} from "./storage";
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:9000';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:9000';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -23,5 +23,14 @@ api.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+export const getWithParams = async (endpoint: string, params: any) => {
+    try {
+        const response = await api.get(endpoint, { params });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
 
 export default api;
